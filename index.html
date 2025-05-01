@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Share & Earn Rewards - Scratch</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="header">
+        <span>Share & Earn Rewards...</span>
+        <span id="verify-status">Verifying!</span>
+    </div>
+
+    <div class="top-buttons">
+        <a href="index.html"><button class="top-button">RANK</button></a>
+        <button class="top-button">EARN MORE</button>
+        <a href="cashout.html"><button class="top-button cash-out-btn">CASH OUT</button></a>
+    </div>
+
+    <div class="balance">
+        <span>💰</span>
+        <span id="balance">₹0</span>
+    </div>
+
+    <div class="section scratch-section">
+        <h1>Scratch</h1>
+        <div class="scratch-count" id="scratch-count">1 left</div>
+        <p>To WIN</p>
+        <button class="scratch-btn" onclick="scratchCard()">Scratch Now!</button>
+    </div>
+
+    <div class="share-section">
+        <div class="share-btn whatsapp" onclick="share('WhatsApp')">📱</div>
+        <div class="share-btn x" onclick="share('X')">X</div>
+        <div class="share-btn facebook" onclick="share('Facebook')">📱</div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
