@@ -3,149 +3,210 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LOGIC NIGHTMARE</title>
+    <title>MATH TRICKSTER HELL</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f0f0f0;
+            font-family: 'Courier New', monospace;
+            background-color: #111;
+            color: #0f0;
             margin: 0;
             padding: 20px;
-            user-select: none; /* Prevent text selection */
+            text-align: center;
+            user-select: none;
+            overflow: hidden;
         }
         .container {
-            max-width: 800px;
+            max-width: 600px;
             margin: 0 auto;
-            text-align: center;
         }
         h1 {
-            font-size: 2.5em;
-            color: #333;
-            transition: all 0.3s;
+            font-size: 2em;
+            text-transform: uppercase;
+            animation: flicker 0.5s infinite;
         }
-        button, input, a {
-            padding: 10px 20px;
+        @keyframes flicker {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        .equation {
+            font-size: 1.5em;
+            margin: 20px;
+            background: #222;
+            padding: 10px;
+            border: 2px solid #0f0;
+        }
+        input, button {
+            font-family: 'Courier New', monospace;
             font-size: 1.2em;
             margin: 10px;
-            cursor: pointer;
+            padding: 10px;
+            background: #000;
+            color: #0f0;
+            border: 1px solid #0f0;
         }
-        button:hover, a:hover {
-            background-color: #ff0000;
-            color: #fff;
-        }
-        .confusing {
-            position: absolute;
-            font-size: 1.5em;
+        button:hover {
+            background: #0f0;
             color: #000;
-            opacity: 0.7;
+        }
+        .trick {
+            position: absolute;
+            font-size: 1.3em;
+            color: #f00;
+            opacity: 0.8;
             pointer-events: none;
         }
         .hidden {
             display: none;
         }
+        #timer {
+            font-size: 1.5em;
+            color: #f00;
+            margin: 10px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1 id="mainTitle">Click the Button to Start!</h1>
-        <button id="startBtn" onclick="startNightmare()">START</button>
-        <button id="escapeBtn" class="hidden" onclick="tryEscape()">ESCAPE</button>
-        <p id="instructions">Instructions: Do NOT press the red button. Or do. Who cares?</p>
-        <input type="text" id="uselessInput" placeholder="Type here (or don't, it’s pointless)">
-        <a href="#" id="fakeLink">Go Somewhere Safe</a>
+        <h1 id="title">SOLVE THIS OR SUFFER!</h1>
+        <p id="timer">Time Left: ∞ seconds</p>
+        <div id="equation" class="equation">2 + 2 = ?</div>
+        <input type="text" id="answerInput" placeholder="Enter answer">
+        <button id="submitBtn" onclick="checkAnswer()">Submit</button>
+        <button id="hintBtn" class="hidden" onclick="showHint()">Get Hint</button>
+        <p id="feedback">Answer correctly to escape...</p>
     </div>
     <audio id="annoyingSound" loop>
-        <source src="https://www.myinstants.com/media/sounds/dial-up-modem.mp3" type="audio/mpeg">
+        <source src="https://www.myinstants.com/media/sounds/windows-xp-error.mp3" type="audio/mpeg">
     </audio>
     <script>
-        let chaosLevel = 0;
+        let trickLevel = 0;
+        let fakeTimer = 10;
+        const equations = [
+            { q: "2 + 2 = ?", a: "22", trick: "It’s string concatenation, not addition!" },
+            { q: "1 / 0 = ?", a: "undefined", trick: "Did you think it was infinity? Nope!" },
+            { q: "√(-1) = ?", a: "i", trick: "Imaginary numbers, gotcha!" },
+            { q: "0 * ∞ = ?", a: "undefined", trick: "Math doesn’t work that way!" },
+            { q: "5! = ?", a: "120", trick: "Factorial, not excitement!" }
+        ];
+        let currentEq = 0;
 
-        function startNightmare() {
-            chaosLevel++;
-            document.getElementById("startBtn").innerText = "Why Did You Click Me?";
-            document.getElementById("mainTitle").innerText = "STOP CLICKING THINGS!";
-            document.getElementById("instructions").innerText = "Wait, no, KEEP clicking. Or not. Whatever.";
-            document.getElementById("escapeBtn").classList.remove("hidden");
-            document.getElementById("uselessInput").value = "Why are you typing?";
-            document.getElementById("fakeLink").href = "#";
-            document.getElementById("fakeLink").innerText = "This Link is Broken";
-
-            // Play annoying dial-up sound
-            document.getElementById("annoyingSound").play();
-
-            // Randomly change button text
+        // Fake timer that never ends
+        function startTimer() {
             setInterval(() => {
-                document.getElementById("startBtn").innerText = [
-                    "Click Me!", "No, Don’t!", "HELP!", "Why?", "STOP!"
-                ][Math.floor(Math.random() * 5)];
+                fakeTimer = (fakeTimer + Math.random() * 10 - 5).toFixed(1);
+                if (fakeTimer < 0) fakeTimer = 10;
+                document.getElementById("timer").innerText = `Time Left: ${fakeTimer} seconds`;
             }, 1000);
+        }
+        startTimer();
 
-            // Spawn confusing floating text
-            setInterval(() => {
-                const texts = [
-                    "This makes sense, right?",
-                    "Clicking does NOTHING!",
-                    "Why are you still here?",
-                    "This is fine.",
-                    "Logic is overrated."
-                ];
-                const div = document.createElement("div");
-                div.className = "confusing";
-                div.innerText = texts[Math.floor(Math.random() * texts.length)];
-                div.style.left = Math.random() * window.innerWidth + "px";
-                div.style.top = Math.random() * window.innerHeight + "px";
-                document.body.appendChild(div);
-                setTimeout(() => div.remove(), 3000);
-            }, 1500);
-
-            // Mess with cursor
-            document.addEventListener("mousemove", (e) => {
-                if (Math.random() < 0.1) {
-                    e.target.style.cursor = ["pointer", "not-allowed", "wait", "crosshair"][Math.floor(Math.random() * 4)];
-                }
-            });
-
-            // Break the input field
-            document.getElementById("uselessInput").addEventListener("input", () => {
-                const input = document.getElementById("uselessInput");
-                input.value = input.value.split("").reverse().join("") + "?!";
-            });
-
-            // Randomly redirect fake link
-            document.getElementById("fakeLink").addEventListener("click", (e) => {
-                e.preventDefault();
-                alert("Haha, nowhere to go!");
-                window.location.href = window.location.href; // Reloads the page
-            });
+        // Play error sound on interaction
+        function playErrorSound() {
+            const sound = document.getElementById("annoyingSound");
+            sound.currentTime = 0;
+            sound.play();
         }
 
-        function tryEscape() {
-            alert("Escape? You thought it’d be THAT easy?");
-            document.getElementById("escapeBtn").innerText = "Try Again (LOL)";
-            document.getElementById("mainTitle").innerText = "YOU’RE STUCK FOREVER!";
-            document.getElementById("instructions").innerText = "Escape is not an option. Or is it?";
-            chaosLevel++;
-            if (chaosLevel > 2) {
-                document.body.innerHTML = "<h1>WHY ARE YOU STILL HERE?!</h1><p>Just close the tab already!</p>";
+        // Check answer with trick logic
+        function checkAnswer() {
+            playErrorSound();
+            const input = document.getElementById("answerInput").value.trim();
+            const correct = equations[currentEq].a;
+            trickLevel++;
+            
+            if (input === correct) {
+                document.getElementById("feedback").innerText = "Correct?! Wait, that’s not supposed to happen!";
+                setTimeout(() => {
+                    document.getElementById("feedback").innerText = "Just kidding, WRONG!";
+                    nextEquation();
+                }, 1000);
+            } else {
+                const wrongMessages = [
+                    `Nope! ${equations[currentEq].trick}`,
+                    `Really? ${input}? Try harder!`,
+                    `Math hates you today!`,
+                    `That’s not even close!`
+                ];
+                document.getElementById("feedback").innerText = wrongMessages[Math.floor(Math.random() * 4)];
+                if (Math.random() < 0.3) {
+                    document.getElementById("answerInput").value = Math.random().toString(36).slice(2);
+                }
+            }
+
+            document.getElementById("hintBtn").classList.remove("hidden");
+            if (trickLevel > 3) {
+                document.body.innerHTML = "<h1>MATH WINS, YOU LOSE!</h1><p>Just give up already!</p>";
                 setTimeout(() => window.location.reload(), 3000);
             }
         }
 
-        // Prevent right-click
-        document.addEventListener("contextmenu", (e) => {
-            e.preventDefault();
-            alert("No cheating with right-click!");
-        });
+        // Show misleading hint
+        function showHint() {
+            playErrorSound();
+            const fakeHints = [
+                "Try dividing by zero!",
+                "Think in binary... or not.",
+                "The answer is always 42. Maybe.",
+                "Use calculus! (Just kidding)",
+                "Count on your fingers!"
+            ];
+            alert(`Hint: ${fakeHints[Math.floor(Math.random() * 5)]}`);
+            document.getElementById("hintBtn").innerText = "Another Useless Hint";
+        }
 
-        // Prevent keyboard shortcuts
-        document.addEventListener("keydown", (e) => {
-            if (e.ctrlKey || e.altKey || e.key === "Escape") {
-                e.preventDefault();
-                alert("No shortcuts allowed! 😜");
+        // Next equation
+        function nextEquation() {
+            currentEq = (currentEq + 1) % equations.length;
+            document.getElementById("equation").innerText = equations[currentEq].q;
+            document.getElementById("answerInput").value = "";
+            document.getElementById("feedback").innerText = "Try this one... or don’t.";
+        }
+
+        // Spawn trick text
+        setInterval(() => {
+            const texts = [
+                "1 + 1 = 11",
+                "π = 3.14... or 22/7?",
+                "0 = 1, trust me!",
+                "Math is lying!",
+                "x = x + 1"
+            ];
+            const div = document.createElement("div");
+            div.className = "trick";
+            div.innerText = texts[Math.floor(Math.random() * texts.length)];
+            div.style.left = Math.random() * window.innerWidth + "px";
+            div.style.top = Math.random() * window.innerHeight + "px";
+            document.body.appendChild(div);
+            setTimeout(() => div.remove(), 2000);
+        }, 1500);
+
+        // Input sabotage
+        document.getElementById("answerInput").addEventListener("input", (e) => {
+            if (Math.random() < 0.2) {
+                e.target.value = e.target.value.replace(/[0-9]/g, "X");
+                playErrorSound();
             }
         });
 
-        // Annoying reload warning
-        window.onbeforeunload = () => "You can’t leave! Or can you? Who knows!";
+        // Prevent shortcuts
+        document.addEventListener("keydown", (e) => {
+            if (e.ctrlKey || e.altKey || e.key === "Escape" || e.key === "F12") {
+                e.preventDefault();
+                alert("No escaping the math!");
+                playErrorSound();
+            }
+        });
+
+        // Prevent right-click
+        document.addEventListener("contextmenu", (e) => {
+            e.preventDefault();
+            alert("Math doesn’t allow cheating!");
+            playErrorSound();
+        });
+
+        // Trick on page leave
+        window.onbeforeunload = () => "You can’t escape the equations!";
     </script>
 </body>
 </html>
