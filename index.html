@@ -3,189 +3,214 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MATH TRICKSTER HELL</title>
+    <title>MATH TRAP MATRIX</title>
     <style>
         body {
-            font-family: 'Courier New', monospace;
-            background-color: #111;
-            color: #0f0;
+            font-family: 'Verdana', sans-serif;
+            background: linear-gradient(45deg, #000, #1a1a1a);
+            color: #0ff;
             margin: 0;
             padding: 20px;
             text-align: center;
             user-select: none;
             overflow: hidden;
+            cursor: crosshair;
         }
         .container {
-            max-width: 600px;
+            max-width: 700px;
             margin: 0 auto;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border: 3px solid #0ff;
+            box-shadow: 0 0 20px #0ff;
         }
         h1 {
-            font-size: 2em;
-            text-transform: uppercase;
-            animation: flicker 0.5s infinite;
+            font-size: 2.2em;
+            letter-spacing: 2px;
+            animation: glitch 0.3s infinite;
         }
-        @keyframes flicker {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-5px, 5px); }
+            40% { transform: translate(5px, -5px); }
+            60% { transform: translate(-5px, 0); }
+            80% { transform: translate(5px, 5px); }
+            100% { transform: translate(0); }
         }
-        .equation {
-            font-size: 1.5em;
-            margin: 20px;
-            background: #222;
-            padding: 10px;
-            border: 2px solid #0f0;
+        .puzzle {
+            font-size: 1.6em;
+            margin: 15px;
+            padding: 15px;
+            background: #111;
+            border: 2px dashed #0ff;
+            transition: transform 0.2s;
+        }
+        .puzzle:hover {
+            transform: scale(1.05);
         }
         input, button {
-            font-family: 'Courier New', monospace;
-            font-size: 1.2em;
+            font-family: 'Verdana', sans-serif;
+            font-size: 1.3em;
             margin: 10px;
-            padding: 10px;
+            padding: 12px;
             background: #000;
-            color: #0f0;
-            border: 1px solid #0f0;
+            color: #0ff;
+            border: 2px solid #0ff;
+            transition: all 0.2s;
         }
         button:hover {
-            background: #0f0;
+            background: #0ff;
             color: #000;
+            transform: rotate(5deg);
         }
-        .trick {
+        input:focus {
+            outline: none;
+            box-shadow: 0 0 10px #0ff;
+        }
+        .trap {
             position: absolute;
-            font-size: 1.3em;
+            font-size: 1.4em;
             color: #f00;
-            opacity: 0.8;
+            text-shadow: 0 0 5px #f00;
             pointer-events: none;
+            animation: float 2s infinite;
         }
-        .hidden {
-            display: none;
+        @keyframes float {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0); }
         }
-        #timer {
-            font-size: 1.5em;
+        #status {
+            font-size: 1.2em;
             color: #f00;
             margin: 10px;
+        }
+        #counter {
+            font-size: 1.5em;
+            color: #ff0;
+            position: fixed;
+            top: 10px;
+            right: 10px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1 id="title">SOLVE THIS OR SUFFER!</h1>
-        <p id="timer">Time Left: ∞ seconds</p>
-        <div id="equation" class="equation">2 + 2 = ?</div>
-        <input type="text" id="answerInput" placeholder="Enter answer">
-        <button id="submitBtn" onclick="checkAnswer()">Submit</button>
-        <button id="hintBtn" class="hidden" onclick="showHint()">Get Hint</button>
-        <p id="feedback">Answer correctly to escape...</p>
+        <h1 id="title">TRAPPED IN THE MATH MATRIX!</h1>
+        <p id="counter">Attempts: 0</p>
+        <div id="puzzle" class="puzzle">1 + 1 = ?</div>
+        <input type="text" id="answerInput" placeholder="Enter your answer">
+        <button id="submitBtn" onclick="submitTrap()">Submit</button>
+        <button id="resetBtn" onclick="resetTrap()">Reset Puzzle</button>
+        <p id="status">Solve to escape... or try.</p>
     </div>
     <audio id="annoyingSound" loop>
         <source src="https://www.myinstants.com/media/sounds/windows-xp-error.mp3" type="audio/mpeg">
     </audio>
     <script>
-        let trickLevel = 0;
-        let fakeTimer = 10;
-        const equations = [
-            { q: "2 + 2 = ?", a: "22", trick: "It’s string concatenation, not addition!" },
-            { q: "1 / 0 = ?", a: "undefined", trick: "Did you think it was infinity? Nope!" },
-            { q: "√(-1) = ?", a: "i", trick: "Imaginary numbers, gotcha!" },
-            { q: "0 * ∞ = ?", a: "undefined", trick: "Math doesn’t work that way!" },
-            { q: "5! = ?", a: "120", trick: "Factorial, not excitement!" }
+        let trapLevel = 0;
+        let attempts = 0;
+        const puzzles = [
+            { q: "1 + 1 = ?", a: "11", trick: "It’s a string, not a sum!" },
+            { q: "x + x = 2x. If x = 5, what is x + x?", a: "10", trick: "Did you overthink it? It’s just 5 + 5!" },
+            { q: "∫(0 to 1) 1 dx = ?", a: "1", trick: "Basic integral, but did you expect a trap?" },
+            { q: "(2 * 3) mod 5 = ?", a: "1", trick: "Modulo math! 6 mod 5 = 1." },
+            { q: "sin(π) = ?", a: "0", trick: "Trig is cruel, isn’t it?" }
         ];
-        let currentEq = 0;
+        let currentPuzzle = 0;
 
-        // Fake timer that never ends
-        function startTimer() {
-            setInterval(() => {
-                fakeTimer = (fakeTimer + Math.random() * 10 - 5).toFixed(1);
-                if (fakeTimer < 0) fakeTimer = 10;
-                document.getElementById("timer").innerText = `Time Left: ${fakeTimer} seconds`;
-            }, 1000);
+        // Update attempt counter
+        function updateCounter() {
+            attempts++;
+            document.getElementById("counter").innerText = `Attempts: ${attempts}`;
+            if (attempts % 5 === 0) {
+                document.getElementById("status").innerText = "You’re trying too hard...";
+                playErrorSound();
+            }
         }
-        startTimer();
 
-        // Play error sound on interaction
+        // Play error sound
         function playErrorSound() {
             const sound = document.getElementById("annoyingSound");
             sound.currentTime = 0;
             sound.play();
         }
 
-        // Check answer with trick logic
-        function checkAnswer() {
+        // Submit answer with traps
+        function submitTrap() {
             playErrorSound();
+            updateCounter();
             const input = document.getElementById("answerInput").value.trim();
-            const correct = equations[currentEq].a;
-            trickLevel++;
-            
+            const correct = puzzles[currentPuzzle].a;
+            trapLevel++;
+
+            // Randomly mess with input
+            if (Math.random() < 0.3) {
+                document.getElementById("answerInput").value = input.split("").reverse().join("") + "!";
+                document.getElementById("status").innerText = "Oops, your answer flipped!";
+                return;
+            }
+
+            // Trick logic
             if (input === correct) {
-                document.getElementById("feedback").innerText = "Correct?! Wait, that’s not supposed to happen!";
+                document.getElementById("status").innerText = "Correct? Haha, NOPE!";
                 setTimeout(() => {
-                    document.getElementById("feedback").innerText = "Just kidding, WRONG!";
-                    nextEquation();
-                }, 1000);
+                    document.getElementById("status").innerText = `Trick: ${puzzles[currentPuzzle].trick}`;
+                    nextPuzzle();
+                }, 800);
             } else {
-                const wrongMessages = [
-                    `Nope! ${equations[currentEq].trick}`,
-                    `Really? ${input}? Try harder!`,
-                    `Math hates you today!`,
-                    `That’s not even close!`
+                const traps = [
+                    `Wrong! ${puzzles[currentPuzzle].trick}`,
+                    `You typed ${input}? That’s adorable!`,
+                    `Math is laughing at you!`,
+                    `Try again... or don’t.`
                 ];
-                document.getElementById("feedback").innerText = wrongMessages[Math.floor(Math.random() * 4)];
-                if (Math.random() < 0.3) {
-                    document.getElementById("answerInput").value = Math.random().toString(36).slice(2);
+                document.getElementById("status").innerText = traps[Math.floor(Math.random() * 4)];
+                if (Math.random() < 0.2) {
+                    document.getElementById("puzzle").innerText = puzzles[currentPuzzle].q.split("").reverse().join("");
                 }
             }
 
-            document.getElementById("hintBtn").classList.remove("hidden");
-            if (trickLevel > 3) {
-                document.body.innerHTML = "<h1>MATH WINS, YOU LOSE!</h1><p>Just give up already!</p>";
-                setTimeout(() => window.location.reload(), 3000);
-            }
-        }
+            // Endgame
+            if (trapLevel > 4) {
+                document.body.innerHTML = "<h1>MATH TRAP WINS!</h1><p>You’re stuck forever! Close the tab!</p>";
+                setTimeout(() => window.location.reload(), 自由
 
-        // Show misleading hint
-        function showHint() {
-            playErrorSound();
-            const fakeHints = [
-                "Try dividing by zero!",
-                "Think in binary... or not.",
-                "The answer is always 42. Maybe.",
-                "Use calculus! (Just kidding)",
-                "Count on your fingers!"
-            ];
-            alert(`Hint: ${fakeHints[Math.floor(Math.random() * 5)]}`);
-            document.getElementById("hintBtn").innerText = "Another Useless Hint";
-        }
-
-        // Next equation
-        function nextEquation() {
-            currentEq = (currentEq + 1) % equations.length;
-            document.getElementById("equation").innerText = equations[currentEq].q;
-            document.getElementById("answerInput").value = "";
-            document.getElementById("feedback").innerText = "Try this one... or don’t.";
-        }
-
-        // Spawn trick text
+                // Spawn trap text
         setInterval(() => {
-            const texts = [
-                "1 + 1 = 11",
-                "π = 3.14... or 22/7?",
-                "0 = 1, trust me!",
-                "Math is lying!",
-                "x = x + 1"
+            const traps = [
+                "1 = 2",
+                "e = mc²",
+                "0/0 = 42",
+                "∞ + 1 = ∞",
+                "2 = 2² = 2²²"
             ];
             const div = document.createElement("div");
-            div.className = "trick";
-            div.innerText = texts[Math.floor(Math.random() * texts.length)];
+            div.className = "trap";
+            div.innerText = traps[Math.floor(Math.random() * traps.length)];
             div.style.left = Math.random() * window.innerWidth + "px";
             div.style.top = Math.random() * window.innerHeight + "px";
             document.body.appendChild(div);
-            setTimeout(() => div.remove(), 2000);
-        }, 1500);
+            setTimeout(() => div.remove(), 2500);
+        }, 1200);
 
-        // Input sabotage
+        // Sabotage input
         document.getElementById("answerInput").addEventListener("input", (e) => {
-            if (Math.random() < 0.2) {
-                e.target.value = e.target.value.replace(/[0-9]/g, "X");
+            if (Math.random() < 0.25) {
+                const sabotage = ["NaN", "∞", "ERROR", "π"];
+                e.target.value = sabotage[Math.floor(Math.random() * 4)];
                 playErrorSound();
+            }
+        });
+
+        // Button swap trick
+        document.getElementById("submitBtn").addEventListener("mouseover", () => {
+            if (Math.random() < 0.3) {
+                const submit = document.getElementById("submitBtn");
+                const reset = document.getElementById("resetBtn");
+                const temp = submit.innerText;
+                submit.innerText = reset.innerText;
+                reset.innerText = temp;
             }
         });
 
@@ -193,7 +218,7 @@
         document.addEventListener("keydown", (e) => {
             if (e.ctrlKey || e.altKey || e.key === "Escape" || e.key === "F12") {
                 e.preventDefault();
-                alert("No escaping the math!");
+                alert("Math traps don’t allow shortcuts!");
                 playErrorSound();
             }
         });
@@ -201,12 +226,12 @@
         // Prevent right-click
         document.addEventListener("contextmenu", (e) => {
             e.preventDefault();
-            alert("Math doesn’t allow cheating!");
+            alert("Right-click? Math says NO!");
             playErrorSound();
         });
 
         // Trick on page leave
-        window.onbeforeunload = () => "You can’t escape the equations!";
+        window.onbeforeunload = () => "The matrix won’t let you go!";
     </script>
 </body>
 </html>
