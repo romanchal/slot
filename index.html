@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>OSINT Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<body>
+    <h1>OSINT Dashboard</h1>
+    <form method="post">
+        <input type="text" name="query" placeholder="Enter phone/email/username" value="{{ query }}" required />
+        <button type="submit">Search</button>
+    </form>
+    <hr />
+    {% if results %}
+        <h2>Results for "{{ query }}"</h2>
+        {% if results.phone %}
+            <h3>Phone Info:</h3>
+            <pre>{{ results.phone | tojson(indent=2) }}</pre>
+        {% endif %}
+        {% if results.email %}
+            <h3>Email Breaches:</h3>
+            <pre>{{ results.email | tojson(indent=2) }}</pre>
+        {% endif %}
+        {% if results.username %}
+            <h3>Username Socialscan:</h3>
+            <pre>{{ results.username | tojson(indent=2) }}</pre>
+        {% endif %}
+    {% endif %}
+</body>
+</html>
